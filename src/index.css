@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+.f-display { font-family: 'Space Grotesk', sans-serif; }
+.f-body { font-family: 'Inter', sans-serif; }
+.f-mono { font-family: 'JetBrains Mono', monospace; }
+::selection { background: #2fe9c4; color: #061313; }
+input::placeholder, textarea::placeholder { color: #5c6494; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
+
+@keyframes floatUp { from { opacity:0; transform: translateY(10px);} to { opacity:1; transform: translateY(0);} }
+.anim-in { animation: floatUp 0.35s ease both; }
