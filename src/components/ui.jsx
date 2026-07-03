@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Lock, Fingerprint, Check, ChevronDown } from "lucide-react";
 import { C, GRAD, GRAD_SOFT, STAGES } from "../theme.js";
+import logoImg from "../assets/logo.png"; // Adjust extension if it's .svg or .jpg
 
 export function Logo({ size = 28 }) {
   return (
@@ -14,6 +15,21 @@ export function Logo({ size = 28 }) {
       >
         <Lock size={size * 0.52} color="#061313" strokeWidth={2.6} />
       </div>
+      <span className="f-display" style={{ fontSize: size * 0.66, fontWeight: 700, color: C.text, letterSpacing: "-0.02em" }}>
+        Legion
+      </span>
+    </div>
+  );
+}
+
+export function Logo({ size = 28 }) {
+  return (
+    <div className="flex items-center gap-2">
+      <img 
+        src={logoImg} 
+        alt="Legion Logo" 
+        style={{ width: size, height: size, objectFit: "contain" }} 
+      />
       <span className="f-display" style={{ fontSize: size * 0.66, fontWeight: 700, color: C.text, letterSpacing: "-0.02em" }}>
         Legion
       </span>
