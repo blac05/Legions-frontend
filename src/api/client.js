@@ -35,6 +35,8 @@ export const api = {
   setup2FA: () => request("/auth/2fa/setup", { method: "POST" }),
   verify2FA: (token) => request("/auth/2fa/verify", { method: "POST", body: { token } }),
   challenge2FA: (token) => request("/auth/2fa/challenge", { method: "POST", body: { token } }),
+  forgotPassword: (email) => request("/auth/password/forgot", { method: "POST", body: { email } }),
+  resetPassword: (payload) => request("/auth/password/reset", { method: "POST", body: payload }),
 
   // escrows
   createEscrow: (payload) => request("/escrows", { method: "POST", body: payload }),
