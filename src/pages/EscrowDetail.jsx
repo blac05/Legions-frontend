@@ -3,7 +3,7 @@ import {
   ChevronLeft, AlertTriangle, Check, ShieldCheck, ArrowDownRight, ArrowUpRight, X,
 } from "lucide-react";
 import { C, fmtMoney, feeRate, FUNDING_METHODS } from "../theme.js";
-import { Facet, Pill, MilestoneBar, GradBtn, GhostBtn, TwoFactorModal } from "../components/ui.jsx";
+import { Logo, Facet, Field, Input, GradBtn, TwoFactorModal as TwoFAModal } from "../components/ui.jsx";
 import { api } from "../api/client.js";
 
 export default function EscrowDetail({ escrow, onBack, onUpdated, currentUserId }) {
@@ -222,4 +222,3 @@ export default function EscrowDetail({ escrow, onBack, onUpdated, currentUserId 
     </div>
   );
 }
-
