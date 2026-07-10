@@ -17,7 +17,6 @@ export default function App() {
   const [view, setView] = useState("dashboard");
   const [escrows, setEscrows] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
-
   const isAdmin = user?.role === "agent_admin";
 
   useEffect(() => {

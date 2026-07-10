@@ -35,6 +35,11 @@ export const api = {
   setup2FA: () => request("/auth/2fa/setup", { method: "POST" }),
   verify2FA: (token) => request("/auth/2fa/verify", { method: "POST", body: { token } }),
   challenge2FA: (token) => request("/auth/2fa/challenge", { method: "POST", body: { token } }),
+  regenerateBackupCodes: (token) => request("/auth/2fa/backup-codes/regenerate", { method: "POST", body: { token } }),
+  forgotPassword: (email) => request("/auth/password/forgot", { method: "POST", body: { email } }),
+  resetPassword: (payload) => request("/auth/password/reset", { method: "POST", body: payload }),
+  verifyEmail: (payload) => request("/auth/email/verify", { method: "POST", body: payload }),
+  resendVerificationEmail: () => request("/auth/email/resend", { method: "POST" }),
 
   // escrows
   createEscrow: (payload) => request("/escrows", { method: "POST", body: payload }),
@@ -51,8 +56,8 @@ export const api = {
   // disputes
   myDisputes: () => request("/disputes/mine"),
   allDisputes: (status) => request(`/disputes${status ? `?status=${status}` : ""}`),
-  resolveDispute: (id, resolution, notes) =>
-    request(`/disputes/${id}/resolve`, { method: "POST", body: { resolution, notes } }),
+  resolveDispute: (id, resolution, notes, splitPercent) =>
+    request(`/disputes/${id}/resolve`, { method: "POST", body: { resolution, notes, splitPercent } }),
 };
 
 export function saveToken(token) {

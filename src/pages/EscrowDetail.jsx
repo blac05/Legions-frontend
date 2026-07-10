@@ -3,7 +3,7 @@ import {
   ChevronLeft, AlertTriangle, Check, ShieldCheck, ArrowDownRight, ArrowUpRight, X,
 } from "lucide-react";
 import { C, fmtMoney, feeRate, FUNDING_METHODS } from "../theme.js";
-import { Logo, Facet, Field, Input, GradBtn, TwoFactorModal as TwoFAModal } from "../components/ui.jsx";
+import { Facet, Pill, MilestoneBar, GradBtn, GhostBtn, TwoFactorModal } from "../components/ui.jsx";
 import { api } from "../api/client.js";
 
 export default function EscrowDetail({ escrow, onBack, onUpdated, currentUserId }) {
@@ -60,6 +60,9 @@ export default function EscrowDetail({ escrow, onBack, onUpdated, currentUserId 
       setBusy(false);
     }
   };
+  const allMet = releasingMilestoneId ? escrow.milestones.find((m) => m._id === releasingMilestoneId)?.conditions.every((c) => c.met) : false;
+  const canRelease = releasingMilestoneId && allMet && !escrow.disputed;
+  const releasingMilestone = releasingMilestoneId ? escrow.milestones.find((m) => m._id === releasingMilestoneId) : null;
 
   return (
     <div className="px-6 md:px-9 pb-10">
@@ -104,31 +107,36 @@ export default function EscrowDetail({ escrow, onBack, onUpdated, currentUserId 
                   <div className="f-display" style={{ fontSize: 15.5, fontWeight: 700, color: C.text }}>{m.title}</div>
                   <div className="flex items-center gap-2">
                     <span className="f-body" style={{ fontSize: 13.5, fontWeight: 700, color: C.text }}>{fmtMoney(m.amount, escrow.currency)}</span>
-                    {m.released && <Pill tone="good">Released</Pill>}
+                    {m.released && !m.refunded && <Pill tone="good">Released</Pill>}
+                    {m.refunded && !m.released && <Pill tone="danger">Refunded</Pill>}
+                    {m.released && m.refunded && <Pill tone="purple">Split {m.splitPercent}% / {100 - m.splitPercent}%</Pill>}
                   </div>
                 </div>
                 <div className="flex flex-col gap-2.5 mt-4 mb-4">
-                  {m.conditions.map((c) => (
-                    <button key={c._id} disabled={busy || escrow.disputed || m.released} onClick={() => toggleCondition(m._id, c._id)} className="flex items-center gap-3" style={{
-                      background: C.bg2, border: `1px solid ${c.met ? "rgba(47,233,196,0.3)" : C.border}`, borderRadius: 11, padding: 13,
-                      cursor: escrow.disputed || m.released ? "not-allowed" : "pointer", textAlign: "left", opacity: m.released ? 0.7 : 1,
-                    }}>
-                      <div style={{
-                        width: 20, height: 20, borderRadius: 6, flexShrink: 0,
-                        background: c.met ? "linear-gradient(135deg,#2fe9c4,#9d6bff)" : "transparent", border: `1.5px solid ${c.met ? "transparent" : C.border}`,
-                        display: "flex", alignItems: "center", justifyContent: "center",
+                  {m.conditions.map((c) => {
+                    const settled = m.released || m.refunded;
+                    return (
+                      <button key={c._id} disabled={busy || escrow.disputed || settled} onClick={() => toggleCondition(m._id, c._id)} className="flex items-center gap-3" style={{
+                        background: C.bg2, border: `1px solid ${c.met ? "rgba(47,233,196,0.3)" : C.border}`, borderRadius: 11, padding: 13,
+                        cursor: escrow.disputed || settled ? "not-allowed" : "pointer", textAlign: "left", opacity: settled ? 0.7 : 1,
                       }}>
-                        {c.met && <Check size={13} color="#04140f" strokeWidth={3} />}
-                      </div>
-                      <span className="f-body" style={{ fontSize: 13.5, color: c.met ? C.text : C.muted }}>{c.text}</span>
-                    </button>
-                  ))}
+                        <div style={{
+                          width: 20, height: 20, borderRadius: 6, flexShrink: 0,
+                          background: c.met ? "linear-gradient(135deg,#2fe9c4,#9d6bff)" : "transparent", border: `1.5px solid ${c.met ? "transparent" : C.border}`,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                        }}>
+                          {c.met && <Check size={13} color="#04140f" strokeWidth={3} />}
+                        </div>
+                        <span className="f-body" style={{ fontSize: 13.5, color: c.met ? C.text : C.muted }}>{c.text}</span>
+                      </button>
+                    );
+                  })}
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="f-body" style={{ fontSize: 12.5, fontWeight: 600, color: allMet || m.released ? C.teal : C.warn }}>
-                    {m.released ? "Funds released" : allMet ? "Ready to release" : "Awaiting conditions"}
+                  <span className="f-body" style={{ fontSize: 12.5, fontWeight: 600, color: allMet || m.released || m.refunded ? C.teal : C.warn }}>
+                    {m.refunded && !m.released ? "Refunded to depositor" : m.released && m.refunded ? "Split between parties" : m.released ? "Funds released" : allMet ? "Ready to release" : "Awaiting conditions"}
                   </span>
-                  {!m.released && (
+                  {!m.released && !m.refunded && (
                     <GradBtn size="sm" icon={ShieldCheck} disabled={!allMet || escrow.disputed} onClick={() => setReleasingMilestoneId(m._id)}>
                       Release milestone
                     </GradBtn>
@@ -186,7 +194,7 @@ export default function EscrowDetail({ escrow, onBack, onUpdated, currentUserId 
         </div>
       </div>
 
-      <TwoFAModal open={!!releasingMilestoneId} action="Releasing milestone funds" error={twoFAError} onClose={() => setReleasingMilestoneId(null)} onConfirm={confirmRelease} />
+      <TwoFAModal open={!!releasingMilestoneId} action="Releasing milestone funds" error={twoFAError} allowBackupCode={false} onClose={() => setReleasingMilestoneId(null)} onConfirm={confirmRelease} />
 
       {showDispute && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(4,6,20,0.72)" }}>
@@ -214,3 +222,4 @@ export default function EscrowDetail({ escrow, onBack, onUpdated, currentUserId 
     </div>
   );
 }
+

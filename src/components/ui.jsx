@@ -18,6 +18,7 @@ export function Logo({ size = 28 }) {
   );
 }
 
+
 export function Facet({ children, style = {}, className = "", onClick }) {
   return (
     <div
