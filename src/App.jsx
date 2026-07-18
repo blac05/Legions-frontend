@@ -20,10 +20,11 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(null);
   const isAdmin = user?.role === "agent_admin";
 
-  // Handle initial auth check
+  // Handle initial auth check with Landing page fallback
   useEffect(() => {
     if (!hasToken()) {
-      setPhase("auth");
+      // Show Landing page immediately if no token
+      setPhase("landing");
       return;
     }
     api.me()
@@ -59,7 +60,7 @@ export default function App() {
 
   // Handler for "Get Started" from Landing page
   const handleGetStarted = () => {
-    setPhase("landing");
+    setPhase("auth");
   };
 
   // Render based on phase
