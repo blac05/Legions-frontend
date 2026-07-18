@@ -10,15 +10,17 @@ import EscrowDetail from "./pages/EscrowDetail.jsx";
 import Disputes from "./pages/Disputes.jsx";
 import AdminConsole from "./pages/AdminConsole.jsx";
 import SettingsView from "./pages/Settings.jsx";
+import Landing from "./pages/Landing.jsx"; // Import your Landing page
 
 export default function App() {
-  const [phase, setPhase] = useState("loading"); // loading -> auth -> onboarding -> app
+  const [phase, setPhase] = useState("loading"); // possible phases: loading, auth, onboarding, app, landing
   const [user, setUser] = useState(null);
   const [view, setView] = useState("dashboard");
   const [escrows, setEscrows] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const isAdmin = user?.role === "agent_admin";
 
+  // Handle initial auth check
   useEffect(() => {
     if (!hasToken()) {
       setPhase("auth");
@@ -35,6 +37,7 @@ export default function App() {
       });
   }, []);
 
+  // Load escrows when in app phase
   useEffect(() => {
     if (phase === "app") {
       api.listEscrows().then(({ escrows }) => setEscrows(escrows)).catch(() => {});
@@ -54,6 +57,12 @@ export default function App() {
     setPhase("auth");
   };
 
+  // Handler for "Get Started" from Landing page
+  const handleGetStarted = () => {
+    setPhase("landing");
+  };
+
+  // Render based on phase
   if (phase === "loading") {
     return <div style={{ minHeight: "100vh", background: C.bg }} />;
   }
@@ -71,7 +80,10 @@ export default function App() {
       />
     );
   }
-
+  if (phase === "landing") {
+    return <Landing onGetStarted={handleGetStarted} onLogin={() => setPhase("auth")} />;
+  }
+  // Main app view
   return (
     <div className="flex" style={{ minHeight: "100vh", background: C.bg }}>
       <Sidebar view={view} setView={(v) => { setView(v); setSelectedId(null); }} onLogout={handleLogout} isAdmin={isAdmin} />
